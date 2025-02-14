@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ohio News and Weather Automated Graphics</title>
+  <style>
+    /* Body with a customizable background image */
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: url('background.jpg') no-repeat center center fixed;
+      background-size: cover;
+    }
+    
+    /* Customizable Header Style */
+    h1 {
+      text-align: center;
+      background: var(--header-background, rgba(0, 0, 0, 0.5));
+      border: var(--header-border, 2px solid #fff);
+      font-family: var(--header-font-family, 'Arial', sans-serif);
+      font-size: var(--header-font-size, 36px);
+      color: var(--header-color, #FFFF00);
+      text-shadow: var(--header-text-glow, 0 0 10px rgba(0, 0, 0, 0.8));
+      padding: 10px;
+      margin: 0 auto 20px auto;
+    }
+    
+    /* 4 columns grid (4x4 for 16 items) */
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-top: 20px;
+    }
+    
+    /* Base styles for each page box */
+    .page-box {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 20px;
+      transition: background 0.3s, box-shadow 0.3s;
+      background: var(--box-background, #fff);
+      border: var(--box-border, 1px solid #ddd);
+      border-radius: var(--box-border-radius, 5px);
+      font-family: var(--box-font-family, Arial, sans-serif);
+      font-size: var(--box-font-size, 16px);
+      color: var(--box-color, #333);
+      box-shadow: var(--box-glow, none);
+      /* Text glow for page boxes */
+      text-shadow: var(--box-text-glow, 0 0 5px rgba(255,255,255,0.8));
+    }
+    
+    /* Hover state for each page box */
+    .page-box:hover {
+      background: var(--box-hover-background, #eaeaea);
+      box-shadow: var(--box-hover-glow, 0 0 8px rgba(0, 0, 0, 0.2));
+    }
+    
+    /* Disabled boxes (when no link is provided) */
+    .disabled {
+      pointer-events: none;
+      opacity: 0.6;
+    }
+    
+    /* Daily Weather Joke Container with customizable top and left margins */
+    #jokeContainer {
+      text-align: center;
+      background: var(--header-background, rgba(0, 0, 0, 0.5));
+      border: var(--header-border, 2px solid #fff);
+      font-family: var(--header-font-family, 'Arial', sans-serif);
+      font-size: var(--header-font-size, 36px);
+      color: var(--header-color, #fff);
+      text-shadow: var(--header-text-glow, 0 0 10px rgba(255, 255, 255, 0.8));
+      padding: 10px;
+      margin-top: var(--joke-margin-top, 40px);
+      margin-left: var(--joke-margin-left, 0px);
+    }
+    
+    #jokeText {
+      margin: 0;
+      font-family: var(--joke-font-family, Arial, sans-serif);
+      font-size: var(--joke-font-size, 28px);
+      color: var(--joke-color, #ffffff);
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>OHIO NEWS AND WEATHER AUTOMATED GRAPHICS</h1>
+  
+  <div class="gallery">
+    <!-- Page Box 1 (Active) -->
+    <a href="https://onw2025.github.io/7-Day-Forecast/" class="page-box"
+       style="--box-background: #008000; --box-border: 2px solid #000; --box-font-family: 'Overpass Black', sans-serif; --box-font-size: 16px; --box-color: #FFF; --box-glow: 0 0 5px rgba(0, 0, 0, 1); --box-text-glow: 0 0 10px rgba(0,0,0,1); --box-hover-background: #000; --box-hover-glow: 0 0 10px rgba(119,119,119,0.4);">
+      7 DAY CITY FORECASTS
+    </a>
+
+    <!-- Page Box 2 (Active) -->
+    <a href="https://onw2025.github.io/LUNCH-HOUR-FORECAST/" class="page-box"
+       style="--box-background: #FFA500; --box-border: 2px solid #000; --box-font-family: 'Overpass Black', sans-serif; --box-font-size: 16px; --box-color: #FFF; --box-glow: 0 0 5px rgba(0,0,0,1); --box-text-glow: 0 0 10px rgba(0,0,0,1); --box-hover-background: #000; --box-hover-glow: 0 0 10px rgba(85,85,85,0.4);">
+      LUNCH HOUR FORECAST
+    </a>
+
+    <!-- Page Box 3 (Active) -->
+    <a href="https://onw2025.github.io/CURRENT-TEMPERATURES/" class="page-box"
+       style="--box-background: #0000FF; --box-border: 2px solid #000; --box-font-family: 'Overpass Black', sans-serif; --box-font-size: 16px; --box-color: #FFF; --box-glow: 0 0 5px rgba(0,0,0,1); --box-text-glow: 0 0 10px rgba(0,0,0,1); --box-hover-background: #000; --box-hover-glow: 0 0 10px rgba(119,119,119,0.4);">
+      CURRENT TEMPERATURES
+    </a>
+
+    <!-- Page Box 4 (Active) -->
+    <a href="https://onw2025.github.io/BUS-STOP-FORECAST/" class="page-box"
+       style="--box-background: #800080; --box-border: 2px solid #000; --box-font-family: 'Overpass Black', sans-serif; --box-font-size: 16px; --box-color: #FFF; --box-glow: 0 0 5px rgba(0,0,0,1); --box-text-glow: 0 0 5px rgba(0,0,0,1); --box-hover-background: #000; --box-hover-glow: 0 0 10px rgba(119,119,119,0.4);">
+      BUS STOP FORECAST PICK-UP
+    </a>
+
+    <!-- Page Box 5 (Active) -->
+    <a href="https://belparkmedia.com/snow-emergencies/" class="page-box"
+       style="--box-background: #FF0000; --box-border: 2px solid #000; --box-font-family: 'Overpass Black', sans-serif; --box-font-size: 16px; --box-color: #FFF; --box-glow: 0 0 5px rgba(0,0,0,1); --box-text-glow: 0 0 5px rgba(0,0,0,1); --box-hover-background: #000; --box-hover-glow: 0 0 10px rgba(119,119,119,0.4);">
+      SNOW EMERGENCIES
+    </a>
+
+    <!-- Page Box 6 (Active) -->
+    <a href="https://onw2025.github.io/CURRENT-CONDITIONS/" class="page-box"
+       style="--box-background: #FF007F; --box-border: 2px solid #000; --box-font-family: 'Overpass Black', sans-serif; --box-font-size: 16px; --box-color: #FFF; --box-glow: 0 0 5px rgba(0,0,0,1); --box-text-glow: 0 0 5px rgba(0,0,0,1); --box-hover-background: #000; --box-hover-glow: 0 0 10px rgba(119,119,119,0.4);">
+      CURRENT CONDITIONS
+    </a>
+
+    <!-- Page Box 7 (Inactive) -->
+    <a href="" class="page-box disabled"
+       style="--box-background: #fff; --box-border: 2px dashed #999; --box-font-family: 'Courier New', monospace; --box-font-size: 16px; --box-color: #666; --box-glow: none; --box-text-glow: none;">
+      Page 7 (Inactive)
+    </a>
+
+    <!-- Page Box 8 (Inactive) -->
+    <a href="" class="page-box disabled"
+       style="--box-background: #fff; --box-border: 2px dashed #999; --box-font-family: 'Courier New', monospace; --box-font-size: 16px; --box-color: #666; --box-glow: none; --box-text-glow: none;">
+      Page 8 (Inactive)
+    </a>
+
+    <!-- Page Box 9 (Inactive) -->
+    <a href="" class="page-box disabled"
+       style="--box-background: #fff; --box-border: 2px dashed #999; --box-font-family: 'Courier New', monospace; --box-font-size: 16px; --box-color: #666; --box-glow: none; --box-text-glow: none;">
+      Page 9 (Inactive)
+    </a>
+
+    <!-- Page Box 10 (Inactive) -->
+    <a href="" class="page-box disabled"
+       style="--box-background: #fff; --box-border: 2px dashed #999; --box-font-family: 'Courier New', monospace; --box-font-size: 16px; --box-color: #666; --box-glow: none; --box-text-glow: none;">
+      Page 10 (Inactive)
+    </a>
+
+    <!-- Page Box 11 (Inactive) -->
+    <a href="" class="page-box disabled"
+       style="--box-background: #fff; --box-border: 2px dashed #999; --box-font-family: 'Courier New', monospace; --box-font-size: 16px; --box-color: #666; --box-glow: none; --box-text-glow: none;">
+      Page 11 (Inactive)
+    </a>
+
+    <!-- Page Box 12 (Inactive) -->
+    <a href="" class="page-box disabled"
+       style="--box-background: #fff; --box-border: 2px dashed #999; --box-font-family: 'Courier New', monospace; --box-font-size: 16px; --box-color: #666; --box-glow: none; --box-text-glow: none;">
+      Page 12 (Inactive)
+    </a>
+
+    <!-- Page Box 13 (Inactive) -->
+    <a href="" class="page-box disabled"
+       style="--box-background: #fff; --box-border: 2px dashed #999; --box-font-family: 'Courier New', monospace; --box-font-size: 16px; --box-color: #666; --box-glow: none; --box-text-glow: none;">
+      Page 13 (Inactive)
+    </a>
+
+    <!-- Page Box 14 (Inactive) -->
+    <a href="" class="page-box disabled"
+       style="--box-background: #fff; --box-border: 2px dashed #999; --box-font-family: 'Courier New', monospace; --box-font-size: 16px; --box-color: #666; --box-glow: none; --box-text-glow: none;">
+      Page 14 (Inactive)
+    </a>
+
+    <!-- Page Box 15 (Inactive) -->
+    <a href="" class="page-box disabled"
+       style="--box-background: #fff; --box-border: 2px dashed #999; --box-font-family: 'Courier New', monospace; --box-font-size: 16px; --box-color: #666; --box-glow: none; --box-text-glow: none;">
+      Page 15 (Inactive)
+    </a>
+
+    <!-- Page Box 16 (Inactive) -->
+    <a href="" class="page-box disabled"
+       style="--box-background: #fff; --box-border: 2px dashed #999; --box-font-family: 'Courier New', monospace; --box-font-size: 16px; --box-color: #666; --box-glow: none; --box-text-glow: none;">
+      Page 16 (Inactive)
+    </a>
+  </div>
+  
+  <!-- Daily Weather Joke (customizable background with top and left margins) -->
+  <div id="jokeContainer">
+    <p id="jokeText">Daily weather joke will appear here...</p>
+  </div>
+  
+  <script>
+    // Define an array of base weather jokes
+    const baseJokes = [
+      "I tried to catch some fog this morning... I mist!",
+      "Why did the tornado break up with the hurricane? It was too much of a whirlwind!",
+      "What does a cloud wear under his raincoat? Thunderwear!",
+      "I tried to tell a weather joke, but there was a 100% chance it would go over your head.",
+      "When it comes to weather jokes, I'm on cloud nine!",
+      "The forecast today: partly cloudy with a chance of puns!",
+      "What do you call dangerous precipitation? A rain of terror!"
+    ];
+    
+    // Build an array of 300 jokes
+    const jokes = [...baseJokes];
+    while (jokes.length < 300) {
+      jokes.push(`Weather joke ${jokes.length + 1}: It's always sunny when you're having fun!`);
+    }
+    
+    // Calculate the current day of the year
+    const now = new Date();
+    const start = new Date(now.getFullYear(), 0, 0);
+    const diff = now - start;
+    const oneDay = 1000 * 60 * 60 * 24;
+    const dayOfYear = Math.floor(diff / oneDay);
+    
+    // Select a joke based on the day of the year
+    const jokeIndex = dayOfYear % jokes.length;
+    document.getElementById("jokeText").innerText = jokes[jokeIndex];
+  </script>
+</body>
+</html>
