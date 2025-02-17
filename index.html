@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Draggable Text Boxes with Editable Text, Save, and Password</title>
+  <style>
+    /* Main container with fixed resolution */
+    #container {
+      position: relative;
+      width: 1380px;
+      height: 775px;
+      margin: 0 auto;
+      border: 1px solid #ccc;
+      overflow: hidden;
+    }
+    /* Background layer: holds the background image and is blurred until unlocked */
+    #backgroundLayer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('weather headlines.png'); /* Replace with your image URL */
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+      filter: blur(10px); /* Initially blurred */
+      z-index: 1;
+    }
+    /* Overlay layer: holds text boxes and date stamp */
+    #overlayLayer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+    }
+    /* Style for all draggable text elements */
+    .textbox {
+      position: absolute;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0); /* transparent background */
+      color: #fff;
+      font-family: 'Overpass Black', sans-serif;
+      font-size: 48px;
+      border-radius: 0;
+      cursor: move;
+      user-select: none;
+      /* Glow effect */
+      text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+    }
+    /* Smaller font for the date stamp (repositionable as needed) */
+    #datestamp {
+      font-size: 24px;
+      padding: 10px;
+      text-shadow: 0 0 10px rgba(0, 0, 0, 0.8), 0 0 10px rgba(0, 0, 0, 0.8), 0 0 10px rgba(0, 0, 0, 0.8);
+    }
+    /* Tooltip styling */
+    .tooltip {
+      position: absolute;
+      background: rgba(0, 0, 0, 0.7);
+      color: #fff;
+      padding: 5px 10px;
+      font-size: 14px;
+      border-radius: 3px;
+      pointer-events: none;
+      white-space: nowrap;
+      z-index: 1000;
+      display: none;
+    }
+    /* Password modal styling */
+    #passwordModal {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 3000;
+    }
+    #passwordModal input {
+      padding: 10px;
+      font-size: 24px;
+    }
+    #passwordModal button {
+      padding: 10px;
+      font-size: 24px;
+      margin-left: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <!-- Background layer (blurred until password is entered) -->
+    <div id="backgroundLayer"></div>
+    
+    <!-- Overlay layer contains text boxes and date stamp -->
+    <div id="overlayLayer">
+      <div id="box1" class="textbox" style="top: 173px; left: 174px;">
+        Text Box 1 Content
+      </div>
+      <div id="box2" class="textbox" style="top: 339px; left: 174px;">
+        Text Box 2 Content
+      </div>
+      <div id="box3" class="textbox" style="top: 516px; left: 174px;">
+        Text Box 3 Content
+      </div>
+      <!-- Date Stamp (automatically generated) -->
+      <div id="datestamp" class="textbox" style="top: 50px; left: 228px;">
+        <!-- Date will be inserted here -->
+      </div>
+      <!-- Tooltip element -->
+      <div id="tooltip" class="tooltip"></div>
+    </div>
+    
+    <!-- Password Modal (appears on page load) -->
+    <div id="passwordModal">
+      <div>
+        <p style="color: #fff; font-size: 24px;">Enter Password to Unblur Background</p>
+        <input type="password" id="passwordInput" placeholder="Password">
+        <button id="passwordSubmit">Submit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Include html2canvas library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script>
+    /* ========= DATE STAMP SETUP ========= */
+    function updateDateStamp() {
+      const dateElement = document.getElementById('datestamp');
+      const now = new Date();
+      // Format: Day of the week, Month day, and Year.
+      const options = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
+      dateElement.innerText = now.toLocaleDateString('en-US', options);
+    }
+    updateDateStamp();
+
+    /* ========= SIMPLE HASH FUNCTION ========= */
+    function simpleHash(str) {
+      var hash = 0;
+      for (var i = 0; i < str.length; i++) {
+        hash = ((hash << 5) - hash) + str.charCodeAt(i);
+        hash |= 0; // Convert to 32-bit integer
+      }
+      return hash;
+    }
+    
+    // Compute and store the hash of "Belpark#2025!" using our simple hash function.
+    const storedHash = simpleHash("Belpark#2025!");
+    const passwordModal = document.getElementById('passwordModal');
+    const passwordInput = document.getElementById('passwordInput');
+    const passwordSubmit = document.getElementById('passwordSubmit');
+    const backgroundLayer = document.getElementById('backgroundLayer');
+
+    passwordSubmit.addEventListener('click', function() {
+      const inputPassword = passwordInput.value;
+      const inputHash = simpleHash(inputPassword);
+      if (inputHash === storedHash) {
+        // Correct password: remove blur and hide modal
+        backgroundLayer.style.filter = "none";
+        passwordModal.style.display = "none";
+      } else {
+        alert("Incorrect password. Please try again.");
+        passwordInput.value = "";
+      }
+    });
+
+    /* ========= DRAG, DROP, & TEXT EDITING ========= */
+    const overlayLayer = document.getElementById('overlayLayer');
+    const textboxes = overlayLayer.querySelectorAll('.textbox');
+    const tooltip = document.getElementById('tooltip');
+
+    let activeBox = null;
+    let offsetX = 0;
+    let offsetY = 0;
+    let dragStartX = 0;
+    let dragStartY = 0;
+    const DRAG_THRESHOLD = 5;
+
+    textboxes.forEach(box => {
+      // Initiate dragging on mousedown
+      box.addEventListener('mousedown', (e) => {
+        activeBox = box;
+        dragStartX = e.clientX;
+        dragStartY = e.clientY;
+        const boxRect = box.getBoundingClientRect();
+        offsetX = e.clientX - boxRect.left;
+        offsetY = e.clientY - boxRect.top;
+        box.style.zIndex = 100;
+        e.preventDefault();
+      });
+
+      // On click (if not dragged), prompt for text edit (except for the date stamp)
+      box.addEventListener('click', (e) => {
+        const dx = Math.abs(e.clientX - dragStartX);
+        const dy = Math.abs(e.clientY - dragStartY);
+        if (box.id !== 'datestamp' && dx < DRAG_THRESHOLD && dy < DRAG_THRESHOLD) {
+          const newText = prompt("Enter new text for this box:", box.innerText);
+          if (newText !== null) {
+            box.innerText = newText;
+          }
+        }
+      });
+
+      // Tooltip on hover showing current top and left margins
+      box.addEventListener('mouseover', (e) => {
+        updateTooltip(box, e);
+        tooltip.style.display = 'block';
+      });
+      box.addEventListener('mousemove', (e) => {
+        updateTooltip(box, e);
+      });
+      box.addEventListener('mouseout', () => {
+        tooltip.style.display = 'none';
+      });
+    });
+
+    // Drag movement: update position of active box
+    document.addEventListener('mousemove', (e) => {
+      if (activeBox) {
+        const containerRect = document.getElementById('container').getBoundingClientRect();
+        let newLeft = e.clientX - containerRect.left - offsetX;
+        let newTop = e.clientY - containerRect.top - offsetY;
+
+        // Constrain within container boundaries
+        newLeft = Math.max(0, Math.min(newLeft, containerRect.width - activeBox.offsetWidth));
+        newTop = Math.max(0, Math.min(newTop, containerRect.height - activeBox.offsetHeight));
+
+        activeBox.style.left = newLeft + 'px';
+        activeBox.style.top = newTop + 'px';
+        updateTooltip(activeBox, e);
+      }
+    });
+
+    document.addEventListener('mouseup', () => {
+      if (activeBox) {
+        activeBox.style.zIndex = '';
+        activeBox = null;
+      }
+    });
+
+    // Update tooltip text and position
+    function updateTooltip(box, event) {
+      const left = parseInt(box.style.left, 10);
+      const top = parseInt(box.style.top, 10);
+      tooltip.textContent = `Top: ${top}px, Left: ${left}px`;
+      tooltip.style.left = (event.clientX + 10) + 'px';
+      tooltip.style.top = (event.clientY + 10) + 'px';
+    }
+
+    /* ========= RIGHT-CLICK SAVE AS IMAGE ========= */
+    document.getElementById('container').addEventListener('contextmenu', function(e) {
+      e.preventDefault();
+      html2canvas(document.getElementById('container')).then(canvas => {
+        // Create a download link and trigger download
+        let link = document.createElement('a');
+        link.download = 'saved_image.png';
+        link.href = canvas.toDataURL();
+        link.click();
+      });
+    });
+  </script>
+</body>
+</html>
